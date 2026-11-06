@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Internet Speed Log BD - Personal Speed-Test Log</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1 id="appTitle">Internet Speed Log BD</h1>
+    <p class="tagline" id="tagline">Log your own speed-test results - download, upload and ping, ISP by ISP.</p>
+  </div>
+  <button id="langBtn" class="btn secondary" type="button">Bangla</button>
+</header>
+
+<main>
+  <section class="cards" aria-label="Summary">
+    <div class="card"><span class="num" id="statTotal">0</span><span class="lbl" id="lblTotal">Total tests</span></div>
+    <div class="card"><span class="num" id="statAvgDown">-</span><span class="lbl" id="lblAvgDown">Avg download</span></div>
+    <div class="card"><span class="num" id="statMedianDown">-</span><span class="lbl" id="lblMedianDown">Median download</span></div>
+    <div class="card"><span class="num" id="statBestDown">-</span><span class="lbl" id="lblBestDown">Best download</span></div>
+    <div class="card"><span class="num" id="statAvgUp">-</span><span class="lbl" id="lblAvgUp">Avg upload</span></div>
+    <div class="card"><span class="num" id="statAvgPing">-</span><span class="lbl" id="lblAvgPing">Avg ping</span></div>
+    <div class="card"><span class="num small" id="statTrend">-</span><span class="lbl" id="lblTrend">7-day trend</span></div>
+    <div class="card"><span class="num small" id="statBestIsp">-</span><span class="lbl" id="lblBestIsp">Best ISP</span></div>
+  </section>
+
+  <section>
+    <h2 id="hAdd">Log a speed test</h2>
+    <form id="entryForm" class="form" novalidate>
+      <div class="grid2">
+        <label><span id="lblDate">Date *</span><input id="entryDate" type="date"></label>
+        <label><span id="lblTime">Time *</span><input id="entryTime" type="time"></label>
+      </div>
+      <label><span id="lblIsp">ISP *</span><input id="entryIsp" list="ispList" maxlength="60" autocomplete="off" placeholder="e.g. Grameenphone"></label>
+      <datalist id="ispList">
+        <option value="Grameenphone"></option>
+        <option value="Robi"></option>
+        <option value="Banglalink"></option>
+        <option value="Teletalk"></option>
+        <option value="Link3"></option>
+        <option value="Amber IT"></option>
+        <option value="BTCL"></option>
+        <option value="Carnival Internet"></option>
+        <option value="Dot Internet"></option>
+        <option value="Triangle"></option>
+        <option value="KS Network"></option>
+        <option value="Mazeda Networks"></option>
+        <option value="Sam Online"></option>
+      </datalist>
+      <label><span id="lblType">Connection type *</span>
+        <select id="entryType">
+          <option value="Broadband">Broadband</option>
+          <option value="Mobile 4G">Mobile 4G</option>
+          <option value="Mobile 5G">Mobile 5G</option>
+          <option value="Wi-Fi hotspot">Wi-Fi hotspot</option>
+        </select>
+      </label>
+      <div class="grid2">
+        <label><span id="lblDown">Download (Mbps) *</span><input id="entryDown" type="number" step="0.1" min="0.1" max="10000" inputmode="decimal" autocomplete="off"></label>
+        <label><span id="lblUp">Upload (Mbps) *</span><input id="entryUp" type="number" step="0.1" min="0.1" max="10000" inputmode="decimal" autocomplete="off"></label>
+      </div>
+      <label><span id="lblPing">Ping (ms) *</span><input id="entryPing" type="number" step="1" min="1" max="2000" inputmode="numeric" autocomplete="off"></label>
+      <button id="addBtn" class="btn" type="submit">Save entry</button>
+      <p id="entryMsg" class="msg" style="display:none"></p>
+    </form>
+  </section>
+
+  <section>
+    <h2 id="hChart">Download speed - last 14 entries</h2>
+    <div class="chartbox">
+      <p id="chartEmpty" class="empty">No data yet. Log a test to see the chart.</p>
+      <div id="chartBox"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="row between">
+      <h2 id="hHistory">History</h2>
+      <div class="filters">
+        <select id="filterIsp" aria-label="Filter by ISP"></select>
+        <select id="filterType" aria-label="Filter by connection type">
+          <option value="all">All types</option>
+          <option value="Broadband">Broadband</option>
+          <option value="Mobile 4G">Mobile 4G</option>
+          <option value="Mobile 5G">Mobile 5G</option>
+          <option value="Wi-Fi hotspot">Wi-Fi hotspot</option>
+        </select>
+        <select id="filterPeriod" aria-label="Filter by period">
+          <option value="all">All time</option>
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+        </select>
+      </div>
+    </div>
+    <p id="historyEmpty" class="empty">No entries yet. Log your first speed test above.</p>
+    <ul id="historyList" class="list"></ul>
+  </section>
+
+  <section>
+    <h2 id="hCompare">ISP comparison</h2>
+    <p id="compareEmpty" class="empty">No data yet.</p>
+    <div class="tablewrap">
+      <table class="cmp" id="compareTable" style="display:none">
+        <thead>
+          <tr>
+            <th id="colIsp">ISP</th><th id="colTests">Tests</th><th id="colAvgDown">Avg down</th>
+            <th id="colAvgUp">Avg up</th><th id="colAvgPing">Avg ping</th><th id="colBestDown">Best down</th>
+          </tr>
+        </thead>
+        <tbody id="compareBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2 id="hData">Your data</h2>
+    <p id="dataIntro" class="muted">Everything stays in this browser (localStorage). Export a backup, or import one made by this app.</p>
+    <div class="row gap">
+      <button id="exportBtn" class="btn secondary" type="button">Export JSON</button>
+      <label class="btn secondary filebtn"><span id="importLbl">Import JSON</span><input id="importFile" type="file" accept="application/json" hidden></label>
+    </div>
+    <p id="dataMsg" class="msg" style="display:none"></p>
+    <hr>
+    <h3 id="hErase">Erase everything</h3>
+    <p id="eraseIntro" class="muted">Type DELETE below to permanently erase all entries.</p>
+    <div class="row gap">
+      <input id="eraseInput" class="search" placeholder="DELETE" autocomplete="off">
+      <button id="eraseBtn" class="btn danger" type="button">Erase all</button>
+    </div>
+    <p id="eraseMsg" class="msg" style="display:none"></p>
+  </section>
+</main>
+
+<footer>
+  <p id="footerNote">Personal log of your own measurements - not a speed test. Results depend on your device, server and time of day.</p>
+  <p id="qualityNote">Quality bands are this app's own simple labels, not an official standard: Excellent 50+ Mbps and ping 30 ms or less; Good 20+ Mbps and 60 ms or less; Fair 5+ Mbps and 120 ms or less; otherwise Slow.</p>
+</footer>
+
+<script src="i18n.js"></script>
+<script src="logic.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
